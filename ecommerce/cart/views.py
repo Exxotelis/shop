@@ -6,85 +6,62 @@ from django.http import JsonResponse
 
 
 def cart_summary(request):
+    cart = Cart(request)
     # This view could display the items in the cart and their quantities
-    return render(request, 'cart/cart-summary.html')
+    return render(request, 'cart/cart-summary.html', {'cart': cart})
 
 
 def cart_add(request):
     # Creating an instance of the Cart object using the request
     cart = Cart(request)
-    if request.method == 'POST' and request.POST.get('action') == 'post':
-        try:
-            # Getting the product ID from POST data
-            product_id = int(request.POST.get('product_id'))
-            # Getting the product quantity from POST data
-            product_quantity = int(request.POST.get('product_quantity'))
-            # Retrieving the product from the database by ID
-            product = get_object_or_404(Product, id=product_id)
-            # Adding the product to the cart with specified quantity
-            cart.add(product=product, product_qty=product_quantity)
+    if request.POST.get('action') == 'post':
 
-            # Constructing response data for successful addition to the cart
-            response_data = {
-                'message': 'Product added to cart successfully',
-                'product_title': product.title,
-                'product_quantity': product_quantity
-            }
+        # Getting the product ID from POST data
+        product_id = int(request.POST.get('product_id'))
+        # Getting the product quantity from POST data
+        product_quantity = int(request.POST.get('product_quantity'))
+        # Retrieving the product from the database by ID
+        product = get_object_or_404(Product, id=product_id)
+        # Adding the product to the cart with specified quantity
+        cart.add(product=product, product_qty=product_quantity)
 
-            # Returning a JSON response with success information
-            return JsonResponse(response_data)
-        except (ValueError, Product.DoesNotExist) as e:
-            # Handling exceptions like ValueError or Product.DoesNotExist and returning error response
-            response_data = {'error': str(e)}
-            # Returning a JSON error response with status code 400
-            return JsonResponse(response_data, status=400)
-    else:
-        # Handling cases where the request method is not POST or 'action' is not 'post'
-        response_data = {'error': 'Invalid request'}
-        # Returning a JSON error response with status code 400
-        return JsonResponse(response_data, status=400)
+        cart_quantity = cart.__len__()
+
+        # Constructing response data for successful addition to the cart
+        response = JsonResponse({'qty': cart_quantity})
+
+        # Returning a JSON response with success information
+        return response
 
 
-def cart_delete(request, product_id):
+def cart_delete(request):
     # Creating an instance of the Cart object using the request
     cart = Cart(request)
-    # Retrieving the product from the database by ID
-    product = get_object_or_404(Product, id=product_id)
-    cart.remove(product)  # Removing the specified product from the cart
-    # Returning a JSON response for successful removal
-    return JsonResponse({'message': 'Product removed from cart'})
+    if request.POST.get('action') == 'post':
+        # Retrieving the product from the database by ID
+        product_id = int(request.POST.get('product_id'))
+        # Removing the specified product from the cart
+        cart.delete(product=product_id)
+        cart_quantity = cart.__len__()
+        cart_total = cart.get_total()
+        # Returning a JSON response for successful removal
+        response = JsonResponse(
+            {'qty': cart_quantity, 'total': cart_total, 'message': 'Product removed from cart'})
+        return response
 
 
 def cart_update(request):
-    if request.method == 'POST' and request.POST.get('action') == 'post':
-        try:
-            # Getting the product ID from POST data
-            product_id = int(request.POST.get('product_id'))
-            # Getting the new quantity from POST data
-            new_quantity = int(request.POST.get('new_quantity'))
-            # Creating an instance of the Cart object using the request
-            cart = Cart(request)
-            # Retrieving the product from the database by ID
-            product = get_object_or_404(Product, id=product_id)
-            # Updating the product quantity in the cart
-            cart.update(product=product, quantity=new_quantity)
+    cart = Cart(request)
 
-            # Constructing response data for successful cart update
-            response_data = {
-                'message': 'Cart updated successfully',
-                'product_title': product.title,
-                'new_quantity': new_quantity
-            }
+    if request.POST.get('action') == 'post':
+        product_id = int(request.POST.get('product_id'))
+        product_quantity = request.POST.get('product_quantity')
 
-            # Returning a JSON response with success information
-            return JsonResponse(response_data)
-        except (ValueError, Product.DoesNotExist) as e:
-            # Handling exceptions like ValueError or Product.DoesNotExist and returning error response
-            response_data = {'error': str(e)}
-            # Returning a JSON error response with status code 400
-            return JsonResponse(response_data, status=400)
-    else:
-        # Handling cases where the request method is not POST or 'action' is not 'post'
-        response_data = {'error': 'Invalid request'}
-        # Returning a JSON error response with status code 400
-        return JsonResponse(response_data, status=400)
+        cart.update(product=product_id, qty=product_quantity)
+
+        cart_quantity = cart.__len__()
+        cart_total = cart.get_total()
+
+        response = JsonResponse(
+            {'qty': cart_quantity, 'total': cart_total})
+        return response

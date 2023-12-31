@@ -39,7 +39,7 @@
 
                             <div class="col-6"> Price </div>
 
-                            <div class="col-6 text-end"><span class="h4 fw-bold">$ {{product.price}} </span></div>
+                            <div class="col-6 text-end"><span class="h4 fw-bold">£ {{product.price}} </span></div>
 
                         </div>
 
@@ -117,7 +117,9 @@
       },
       success: function(json) {
         // Handle success response if needed
-        console.log(json)
+        //console.log(json)
+        document.getElementById("cart-qty").textContent = json.qty
+
       },
       error: function(xhr, status, error, errmsg) {
         // Handle error if needed
