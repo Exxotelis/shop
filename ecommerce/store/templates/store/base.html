@@ -32,7 +32,7 @@
 	<!-- JavaScript Popper -->
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
-
+        <!--<script src="ecommerce/static/css/media/js/cart.js"></script>-->
 	
 
 	 <!-- Bootstrap Max CDN --> 
@@ -119,7 +119,7 @@
 
                 <li class="nav-item">
             
-                    <a class="btn btn-alert navbar-btn text-white" type="button"  href="/"> Register </a>
+                    <a class="btn btn-alert navbar-btn text-white" type="button"  href="{% url 'register' %}"> Register </a>
 
                 </li>
 
@@ -152,7 +152,7 @@
                                         0
                                     {% endif %}
                             {% endwith %}
-
+                        </div>
                     </a>
 
                 </li>

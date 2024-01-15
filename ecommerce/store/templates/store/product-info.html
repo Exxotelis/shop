@@ -56,7 +56,7 @@
                                 
                                 &nbsp; 
                                
-                                <select id="select">
+                                <select id="select{{ product.id }}">
               
                                     <option value="1">1</option>
               
@@ -99,21 +99,20 @@
 
 <script>
 
-    
+    // Add to cart button click listener
     $(document).on('click', '#add-button', function(e) {
     e.preventDefault();
     
-    var productId = $('#add-button').val();
-    var quantity = $('#select option:selected').text();
+    // Get product ID and quantity
     
     $.ajax({
       type: 'POST',
       url: '{% url "cart-add" %}',
       data: {
-        'product_id': productId,
-        'product_quantity': quantity,
-        'csrfmiddlewaretoken': "{{ csrf_token }}",
-        'action': 'post'
+        product_id: $('#add-button').val(),
+        product_quantity: $('#select option:selected').text(),
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+        action: 'post'
       },
       success: function(json) {
         // Handle success response if needed
